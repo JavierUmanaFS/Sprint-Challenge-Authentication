@@ -1,4 +1,5 @@
 const supertest = require("supertest");
+const bcryptjs = require("bcryptjs");
 
 const server = require("./server.js");
 const db = require("../database/dbConfig.js");
@@ -26,7 +27,6 @@ describe("GET /", () => {
   })
 
   describe("POST /api/jokes", () => {
-
     it("Should return an array", () =>{
       return supertest(server)
       .get("/api/jokes")
@@ -38,9 +38,10 @@ describe("GET /", () => {
 
   })
 
+  const credentials =  {username:"a3javier3224", password: "a3tester3224"};
+
   describe('POST /auth/register', () => {
     it("should register a new user", async (done) =>{
-      const credentials =  {username:"javier32", password: "tester32"};
       try {
         await supertest(server).post("/api/auth/register").send(credentials)
         .then(response =>{
@@ -51,16 +52,21 @@ describe("GET /", () => {
         console.log(err)
         done()
       }
-      // return supertest(server)
-      // .post("/api/auth/register")
-      // .send(credentials)
-      // .then(response =>{
-      //   // expect(response.status).toBe(200);
-      //   console.log(credentials, "creds")
-      //   expect(response.body).toBe("error")
-      // })
     })
   })
   
+  describe("POST /auth/login", () =>{
+    it("Should log in the user", async () =>{
+      try{
+        await supertest(server).post("/api/auth/login").send(credentials)
+        .then(response => {
+          expect(response.status).toBe(200)
+          expect(response.body).toEqual({ message: "Welcome to our api", token: response.body.token })
+        })
+      } catch (err){
+        console.log(err)
+      }
+    })
+  })
 
 })
